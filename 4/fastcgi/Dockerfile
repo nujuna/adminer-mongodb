@@ -12,6 +12,14 @@ RUN	addgroup -S adminer \
 &&	mkdir -p /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
 
+RUN apk add --no-cache \
+	build-base \
+	autoconf \
+	libffi-dev \
+	openssl-dev \
+&& 	pecl install mongodb \
+&& 	echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/docker-php-ext-mongodb.ini
+
 RUN	set -x \
 &&	apk add --no-cache --virtual .build-deps \
 	postgresql-dev \
@@ -33,6 +41,13 @@ RUN	set -x \
 	)" \
 &&	apk add --virtual .phpexts-rundeps $runDeps \
 &&	apk del .build-deps
+
+RUN apk del \
+	build-base \
+	autoconf \
+	libffi-dev \
+	openssl-dev \
+&& 	rm -rf /tmp/pear
 
 COPY	*.php /var/www/html/
 
